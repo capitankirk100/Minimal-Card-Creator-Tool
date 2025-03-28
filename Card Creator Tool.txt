@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Creator Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 0.75rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            color: #555;
+            margin-bottom: 0.25rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .theme-selector {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            margin: 0.75rem 0;
+        }
+
+        .theme-option {
+            height: 25px;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .theme-option:hover {
+            transform: scale(1.05);
+        }
+
+        .theme-option.active {
+            border-color: #000;
+        }
+
+        button {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .card-container {
+            width: 320px;
+            height: 200px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .card-front {
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+        }
+
+        .card-back {
+            background: linear-gradient(to right, #8b5cf6, #3b82f6);
+            transform: rotateY(180deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-content {
+            padding: 1rem;
+            color: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .background-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .card-info h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-info p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .avatar {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            border: 2px solid white;
+            overflow: hidden;
+            background: #ddd;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .services {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .service {
+            text-align: center;
+            font-size: 0.625rem;
+        }
+
+        .service-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            border: 1px solid white;
+            margin: 0 auto 0.25rem;
+            overflow: hidden;
+        }
+
+        .service-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-footer {
+            font-size: 0.625rem;
+            text-align: center;
+        }
+
+        .nfc-circle {
+            width: 80px;
+            height: 80px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Card Creator Tool</h1>
+        
+        <div class="tool-grid">
+            <div class="input-section">
+                <div class="input-group">
+                    <label>Nome</label>
+                    <input type="text" id="name" placeholder="Inserisci il nome">
+                </div>
+                
+                <div class="input-group">
+                    <label>Azienda</label>
+                    <input type="text" id="company" placeholder="Inserisci azienda">
+                </div>
+
+                <div class="input-group">
+                    <label>ID Carta</label>
+                    <input type="text" id="id" placeholder="Inserisci ID">
+                </div>
+
+                <div class="input-group">
+                    <label>Scadenza</label>
+                    <input type="date" id="expiry">
+                </div>
+
+                <div class="input-group">
+                    <label>Tema</label>
+                    <div class="theme-selector" id="themeSelector">
+                        <div class="theme-option active" style="background: linear-gradient(to right, #3b82f6, #8b5cf6);" data-gradient="blue-purple"></div>
+                        <div class="theme-option" style="background: linear-gradient(to right, #22c55e, #3b82f6);" data-gradient="green-blue"></div>
+                        <div class="theme-option" style="background: linear-gradient(to right, #eab308, #ef4444);" data-gradient="yellow-red"></div>
+                        <div class="theme-option" style="background: linear-gradient(to right, #ec4899, #8b5cf6);" data-gradient="pink-purple"></div>
+                        <div class="theme-option" style="background: linear-gradient(to right, #14b8a6, #22c55e);" data-gradient="teal-green"></div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Immagini</label>
+                    <input type="file" id="avatar" accept="image/*" style="display: none">
+                    <input type="file" id="driver4you" accept="image/*" style="display: none">
+                    <input type="file" id="viaggioGusto" accept="image/*" style="display: none">
+                    <button id="avatarBtn">Carica Avatar</button>
+                    <button id="driver4youBtn">Icona Driver4You</button>
+                    <button id="viaggioGustoBtn">Icona Viaggio Gusto</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="rotateYBtn">Ruota →</button>
+                    <button id="rotateZBtn">Ruota ↻</button>
+                </div>
+            </div>
+
+            <div class="card-container">
+                <div class="card" id="card">
+                    <div class="card-face card-front">
+                        <div id="backgroundPattern" class="background-pattern"></div>
+                        <div class="card-content">
+                            <div class="card-header">
+                                <div class="card-info">
+                                    <h2 id="cardName">Nome Cognome</h2>
+                                    <p id="cardCompany">Nome Azienda</p>
+                                </div>
+                                <div class="avatar">
+                                    <img id="avatarImage" style="display: none">
+                                </div>
+                            </div>
+                            
+                            <div class="services">
+                                <div class="service">
+                                    <div class="service-icon">
+                                        <img id="driver4youImg" style="display: none">
+                                    </div>
+                                    <span>Driver4You</span>
+                                </div>
+                                <div class="service">
+                                    <div class="service-icon">
+                                        <img id="viaggioGustoImg" style="display: none">
+                                    </div>
+                                    <span>Viaggio del Gusto</span>
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <p id="cardId">ID: 123456789</p>
+                                <p id="cardExpiry">Scadenza: 31/12/2025</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-face card-back">
+                        <div class="nfc-circle">
+                            NFC
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Elementi DOM
+        const nameInput = document.getElementById('name');
+        const companyInput = document.getElementById('company');
+        const idInput = document.getElementById('id');
+        const expiryInput = document.getElementById('expiry');
+        const avatarInput = document.getElementById('avatar');
+        const driver4youInput = document.getElementById('driver4you');
+        const viaggioGustoInput = document.getElementById('viaggioGusto');
+        const card = document.getElementById('card');
+        const themeSelector = document.getElementById('themeSelector');
+
+        // Gestione input testo
+        nameInput.addEventListener('input', e => {
+            document.getElementById('cardName').textContent = e.target.value || 'Nome Cognome';
+        });
+
+        companyInput.addEventListener('input', e => {
+            document.getElementById('cardCompany').textContent = e.target.value || 'Nome Azienda';
+        });
+
+        idInput.addEventListener('input', e => {
+            document.getElementById('cardId').textContent = 'ID: ' + (e.target.value || '123456789');
+        });
+
+        expiryInput.addEventListener('change', e => {
+            const date = new Date(e.target.value);
+            const formattedDate = date.toLocaleDateString('it-IT');
+            document.getElementById('cardExpiry').textContent = 'Scadenza: ' + (formattedDate || '31/12/2025');
+        });
+
+        // Gestione upload immagini
+        function handleImageUpload(input, imgElement, backgroundElement = null) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    imgElement.src = reader.result;
+                    imgElement.style.display = 'block';
+                    if (backgroundElement) {
+                        backgroundElement.style.backgroundImage = `url(${reader.result})`;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        document.getElementById('avatarBtn').onclick = () => avatarInput.click();
+        document.getElementById('driver4youBtn').onclick = () => driver4youInput.click();
+        document.getElementById('viaggioGustoBtn').onclick = () => viaggioGustoInput.click();
+
+        avatarInput.addEventListener('change', e => handleImageUpload(avatarInput, document.getElementById('avatarImage'), document.getElementById('backgroundPattern')));
+        driver4youInput.addEventListener('change', e => handleImageUpload(driver4youInput, document.getElementById('driver4youImg')));
+        viaggioGustoInput.addEventListener('change', e => handleImageUpload(viaggioGustoInput, document.getElementById('viaggioGustoImg')));
+
+        // Gestione temi
+        themeSelector.addEventListener('click', e => {
+            if (e.target.classList.contains('theme-option')) {
+                document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                const gradient = e.target.style.background;
+                document.querySelector('.card-front').style.background = gradient;
+                document.querySelector('.card-back').style.background = gradient;
+            }
+        });
+
+        // Gestione rotazione
+        let rotationY = 0;
+        let rotationZ = 0;
+
+        document.getElementById('rotateYBtn').addEventListener('click', () => {
+            rotationY = (rotationY + 180) % 360;
+            card.style.transform = `rotateY(${rotationY}deg) rotateZ(${rotationZ}deg)`;
+        });
+
+        document.getElementById('rotateZBtn').addEventListener('click', () => {
+            rotationZ = (rotationZ + 90) % 360;
+            card.style.transform = `rotateY(${rotationY}deg) rotateZ(${rotationZ}deg)`;
+        });
+    </script>
+</body>
+</html>
